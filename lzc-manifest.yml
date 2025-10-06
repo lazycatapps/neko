@@ -162,8 +162,9 @@ services:
     health_check:
       test:
         - CMD-SHELL
-        # 使用 timeout 避免 wget 卡住,退出码 0(成功) 或 124(超时) 都视为健康
-        - 'timeout 3 wget --spider -q http://localhost:59904 2>&1; ret=$$?; [ $$ret -eq 0 ] || [ $$ret -eq 124 ]'
+        # Neko 不支持 HEAD 请求(--spider)，使用 GET 请求但丢弃输出
+        # 使用 timeout 强制 3 秒后终止，退出码 0(成功) 或 124(超时) 都视为健康
+        - 'timeout 3 wget -q -O /dev/null http://host.lzcapp:59904 2>&1; ret=$$?; [ $$ret -eq 0 ] || [ $$ret -eq 124 ]'
       start_period: 30s
       interval: 10s
       timeout: 5s
